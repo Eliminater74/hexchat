@@ -134,6 +134,13 @@ get_gpu(void)
 			continue;
 		}
 
+		const void *class = CFDictionaryGetValue(serviceDictionary, @"class-code");
+		if (!class || *(guint32*)CFDataGetBytePtr(class) != 0x30000) /* DISPLAY_VGA */
+		{
+			CFRelease(serviceDictionary);
+			continue;
+		}
+
 		const void *model = CFDictionaryGetValue(serviceDictionary, @"model");
 		if (model)
 		{
@@ -141,7 +148,7 @@ get_gpu(void)
 			{
 				if (gpu_list->len != 0)
 						g_string_append (gpu_list, ", ");
-				g_string_append_len (gpu_list, (const char*)CFDataGetBytePtr(model), CFDataGetLength(model));
+				g_string_append_len (gpu_list, (const char*)CFDataGetBytePtr(model), CFDataGetLength(model) - 1);
 			}
 		}
 
