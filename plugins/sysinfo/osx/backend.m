@@ -34,14 +34,65 @@
 
 #include "format.h"
 
-char *
-sysinfo_backend_get_os(void)
+static char *
+get_os (void)
+{
+	NSDictionary *systemversion = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
+	NSString *build = [systemversion objectForKey:@"ProductBuildVersion"];
+	if (!build)
+		return NULL;
+	NSString *version = [systemversion objectForKey:@"ProductUserVisibleVersion"];
+	if (!version)
+	{
+		[build release];
+		return NULL;
+	}
+
+	NSDictionary *profiler = [NSDictionary dictionaryWithContentsOfFile:[@"~/Library/Preferences/com.apple.SystemProfiler.plist" stringByExpandingTildeInPath]];
+	NSDictionary *names = [profiler objectForKey:@"OS Names"];
+	NSString *os_name = nil;
+
+	for (NSString *name in names)
+	{
+		if ([name hasPrefix:build])
+		{
+			os_name = [names objectForKey:name];
+			break;
+		}
+	}
+	[build release];
+
+	if (!os_name)
+	{
+		[version release];
+		return NULL;
+	}
+
+	char *ret = g_strdup_printf ("%s %s", [os_name UTF8String], [version UTF8String]);
+	[version release];
+
+	return ret;
+}
+
+static char *
+get_os_fallback (void)
 {
 	NSProcessInfo *info = [NSProcessInfo processInfo];
 	NSOperatingSystemVersion version = [info operatingSystemVersion];
 
-	/* TODO: Does osx store the name anywhere? */
 	return g_strdup_printf ("OS X %ld.%ld.%ld", version.majorVersion, version.minorVersion, version.patchVersion);
+}
+char *
+sysinfo_backend_get_os(void)
+{
+	static char *os_str = NULL;
+	if (!os_str)
+	{
+		os_str = get_os();
+		if (!os_str)
+			os_str = get_os_fallback();
+	}
+	return g_strdup (os_str);
 }
 
 char *
