@@ -1,9 +1,4 @@
 /*
- * parse.h - parsing header for X-Sys
- * by mikeshoup
- * Copyright (C) 2003, 2004, 2005 Michael Shoup
- * Copyright (C) 2005, 2006 Tony Vroon
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -20,16 +15,9 @@
  */
 
 
-#ifndef _PARSE_H_
-#define _PARSE_H_
+#ifndef SYSINFO_SHARED_H
+#define SYSINFO_SHARED_H
 
-int xs_parse_cpu(char *model, char *vendor, double *freq);
-guint64 xs_parse_uptime(void);
-int xs_parse_sound(char *snd_card);
-int xs_parse_meminfo(unsigned long long *mem_tot, unsigned long long *mem_free, int swap);
-int xs_parse_video(char *vid_card);
-int xs_parse_agpbridge(char *agp_bridge);
-int xs_parse_ether(char *ethernet_card);
-int xs_parse_distro(char *name);
+int xs_parse_df(gint64 *total_bytes, gint64 *free_bytes);
 
 #endif

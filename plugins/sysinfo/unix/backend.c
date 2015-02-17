@@ -22,6 +22,7 @@
 #include "match.h"
 #include "sysinfo.h"
 #include "format.h"
+#include "df.h"
 
 char *sysinfo_backend_get_os(void)
 {
@@ -37,7 +38,7 @@ char *sysinfo_backend_get_os(void)
 
 char *sysinfo_backend_get_disk(void)
 {
-	guint64 total, free;
+	gint64 total, free;
 
 	if (xs_parse_df (&total, &free))
 	{

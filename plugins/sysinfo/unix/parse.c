@@ -198,37 +198,6 @@ int xs_parse_agpbridge(char *agp_bridge)
 	return 0;
 }
 
-int xs_parse_df(gint64 *out_total, gint64 *out_free)
-{
-	FILE *pipe;
-	char buffer[bsize];
-	
-	pipe = popen("df -k -l -P", "r");
-	if(pipe==NULL)
-		return 1;
-
-	*out_total = *out_free = 0;
-
-	while(fgets(buffer, bsize, pipe) != NULL)
-	{
-		long long int avail, used;
-
-		/* Filesystem 1024-blocks Used Available Capacity Mounted-on */
-		if (sscanf (buffer, "%*s %*s %lld %lld %*s %*s", &used, &avail) == 2)
-		{
-			*out_total += avail + used;
-			*out_free += avail;
-		}
-	}
-
-	/* Convert to bytes */
-	*out_total *= 1000;
-	*out_free *= 1000;
-
-	pclose(pipe);
-	return 0;
-}
-
 int xs_parse_meminfo(unsigned long long *mem_tot, unsigned long long *mem_free, int swap)
 {
 	FILE *fp;

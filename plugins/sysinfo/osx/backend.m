@@ -33,6 +33,7 @@
 #include <glib.h>
 
 #include "format.h"
+#include "df.h"
 
 static char *
 get_os (void)
@@ -98,7 +99,14 @@ sysinfo_backend_get_os(void)
 char *
 sysinfo_backend_get_disk(void)
 {
-	return NULL;
+	gint64 total, free_space;
+
+	if (xs_parse_df (&total, &free_space))
+	{
+		return NULL;
+	}
+
+	return sysinfo_format_disk (total, free_space);
 }
 
 static guint64
